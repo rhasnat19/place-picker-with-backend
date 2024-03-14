@@ -2,24 +2,27 @@ import { useEffect, useState } from "react";
 import Places from "./Places.jsx";
 
 export default function AvailablePlaces({ onSelectPlace }) {
-  //Fetch available places from backend
+  const [isFetching, setIsFetching] = useState(false);
   const [availablePlaces, setAvailablePlaces] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/places")
-      .then((res) => {
-        return res.json();
-      })
-      .then((resData) => {
-        console.log(resData);
-        setAvailablePlaces(resData.places);
-      });
+    async function fetchPlaces() {
+      setIsFetching(true);
+      const responseData = await fetch("http://localhost:3000/places");
+      const resData = await responseData.json();
+      setAvailablePlaces(resData.places);
+      setIsFetching(false);
+    }
+
+    fetchPlaces();
   }, []);
 
   return (
     <Places
       title="Available Places"
       places={availablePlaces}
+      isLoading={isFetching}
+      loadingText="Fetching place data..."
       fallbackText="No places available."
       onSelectPlace={onSelectPlace}
     />
